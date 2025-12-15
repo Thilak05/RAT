@@ -1,0 +1,79 @@
+# RAT (Python 3.12 Updated)
+
+**⚠️ DISCLAIMER: THIS SOFTWARE IS FOR EDUCATIONAL PURPOSES ONLY.**
+This project is created to demonstrate how Remote Administration Tools (RATs) work and how to defend against them. The author is not responsible for any misuse of this tool. Do not use this on any system you do not own or have explicit permission to test.
+
+## 📖 About
+This project is a Telegram-based Remote Administration Tool (RAT) written in Python. It allows you to control a computer remotely using a Telegram bot.
+
+This version is an update of the original [TeleRAT by henry-richard7](https://github.com/henry-richard7/TeleRAT).
+
+### 🚀 Key Updates & Changes
+- **Python 3.12+ Support**: The codebase has been updated to work with modern Python versions (fixing `asyncio` and `python-telegram-bot` v20+ issues).
+- **Improved Eavesdropping**: Added "Start" and "Stop" recording functionality. The bot sends the audio file immediately after stopping.
+- **PowerShell Access**: Added a silent `/ps` command to execute PowerShell commands without triggering a visible window.
+- **System Control**: Added functionality to remotely shut down the system.
+- **Cleanup**: Removed unstable or redundant modules (Chat, Random Mouse, Type String) to focus on core functionality.
+
+## 🛠️ Features
+- **📟 Get IP**: Retrieve the target's public IP and geolocation.
+- **📸 Get Screenshot**: Capture the current screen.
+- **📷 Webcam Snap**: Take a picture using the webcam.
+- **👂 Eavesdrop**: Record audio from the microphone (Start/Stop control).
+- **🗣️ Text to Speech**: Make the target computer speak a sentence.
+- **🖥️ System Info**: Get detailed hardware and software information.
+- **💻 Shell/PowerShell**: Execute CMD or PowerShell commands remotely.
+- **🗊 File Access**: Download specific files from the target.
+- **🌐 Open Website**: Open a specific URL on the target's browser.
+- **⚠️ Show Alert**: Display a popup message box.
+- **📋 Clipboard**: Retrieve current clipboard content.
+- **🗝️ Wi-Fi Passwords**: Extract saved Wi-Fi passwords.
+- **🔌 Shutdown**: Remotely shut down the computer.
+
+## ⚙️ Installation & Usage
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd rat
+   ```
+
+2. **Install Dependencies**
+   Make sure you have Python installed.
+   ```bash
+   pip install -r requirements.txt
+   ```
+   *Note: You may need to install `pyaudio` separately or use a pre-built wheel if `pip install pyaudio` fails on Windows.*
+
+3. **Configuration**
+   Open `main.py` and update the following lines with your Telegram Bot details:
+   ```python
+   API_KEY = "YOUR_BOT_TOKEN"
+   CHAT_ID = "YOUR_CHAT_ID"
+   ```
+
+4. **Run the RAT**
+   ```bash
+   python main.py
+   ```
+
+5. **Control**
+   Open your Telegram Bot and send `/start` to see the menu.
+
+## 🤖 Bot Commands
+| Command | Description |
+| :--- | :--- |
+| `/start` | Show the main menu |
+| `/ps <command>` | Execute a PowerShell command silently |
+| `/shell <command>` | Execute a CMD command |
+| `/speak <text>` | Speak text on target machine |
+| `/show_popup <msg>` | Show an alert box |
+| `/open_website <url>` | Open a website |
+| `/get_file <path>` | Download a file |
+
+## 🤝 Credits
+- Original Project: [henry-richard7](https://github.com/henry-richard7)
+- Updates & Refactoring: [Thilak](https://github.com/Thilak05).
+
+---
+*Created for learning and security research.*
