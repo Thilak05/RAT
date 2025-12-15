@@ -13,6 +13,9 @@ This version is an update of the original [TeleRAT by henry-richard7](https://gi
 - **Improved Eavesdropping**: Added "Start" and "Stop" recording functionality. The bot sends the audio file immediately after stopping.
 - **PowerShell Access**: Added a silent `/ps` command to execute PowerShell commands without triggering a visible window.
 - **System Control**: Added functionality to remotely shut down the system.
+- **Keylogger**: Added start/stop keylogging capability with log retrieval.
+- **Media Player**: Added hidden audio playback and video playback commands.
+- **File Upload**: Added ability to upload files to the target by sending them to the bot.
 - **Cleanup**: Removed unstable or redundant modules (Chat, Random Mouse, Type String) to focus on core functionality.
 
 ## 🛠️ Features
@@ -24,6 +27,10 @@ This version is an update of the original [TeleRAT by henry-richard7](https://gi
 - **🖥️ System Info**: Get detailed hardware and software information.
 - **💻 Shell/PowerShell**: Execute CMD or PowerShell commands remotely.
 - **🗊 File Access**: Download specific files from the target.
+- **📤 File Upload**: Upload files to the target (supports Documents, Images, Audio, Video).
+- **⌨️ Keylogger**: Record keystrokes (Start/Stop control).
+- **🎵 Play Audio**: Play audio files silently in the background.
+- **🎬 Play Video**: Launch video files on the target.
 - **🌐 Open Website**: Open a specific URL on the target's browser.
 - **⚠️ Show Alert**: Display a popup message box.
 - **📋 Clipboard**: Retrieve current clipboard content.
@@ -70,6 +77,16 @@ This version is an update of the original [TeleRAT by henry-richard7](https://gi
 | `/show_popup <msg>` | Show an alert box |
 | `/open_website <url>` | Open a website |
 | `/get_file <path>` | Download a file |
+| `/playaudio <path>` | Play audio file (hidden) |
+| `/playvideo <path>` | Play video file |
+| `/startkeylog` | Start recording keystrokes |
+| `/stopkeylog` | Stop recording and get log file |
+
+### 📤 File Upload
+To upload a file to the target machine:
+1. Send the file (Document, Photo, Audio, or Video) to the bot.
+2. **Optional**: Add a caption to specify the save path (e.g., `C:\Temp\` or `C:\Users\Public\file.exe`).
+3. If no caption is provided, it saves to the current working directory.
 
 ## 🤝 Credits
 - Original Project: [henry-richard7](https://github.com/henry-richard7)
