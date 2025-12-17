@@ -16,6 +16,7 @@ This version is an update of the original [TeleRAT by henry-richard7](https://gi
 - **Keylogger**: Added start/stop keylogging capability with log retrieval.
 - **Media Player**: Added hidden audio playback and video playback commands.
 - **File Upload**: Added ability to upload files to the target by sending them to the bot.
+- **Reverse Shell**: Added `/connect` command to spawn a reverse shell to a specified IP.
 - **Cleanup**: Removed unstable or redundant modules (Chat, Random Mouse, Type String) to focus on core functionality.
 
 ## 🛠️ Features
@@ -31,6 +32,7 @@ This version is an update of the original [TeleRAT by henry-richard7](https://gi
 - **⌨️ Keylogger**: Record keystrokes (Start/Stop control).
 - **🎵 Play Audio**: Play audio files silently in the background.
 - **🎬 Play Video**: Launch video files on the target.
+- **🔗 Reverse Shell**: Initiate a reverse shell connection to a listener.
 - **🌐 Open Website**: Open a specific URL on the target's browser.
 - **⚠️ Show Alert**: Display a popup message box.
 - **📋 Clipboard**: Retrieve current clipboard content.
@@ -72,7 +74,8 @@ This version is an update of the original [TeleRAT by henry-richard7](https://gi
 | :--- | :--- |
 | `/start` | Show the main menu |
 | `/ps <command>` | Execute a PowerShell command silently |
-| `/shell <command>` | Execute a CMD command |
+| `/cmd <command>` | Execute a CMD command |
+| `/connect <ip>` | Start reverse shell to IP:3001 |
 | `/speak <text>` | Speak text on target machine |
 | `/show_popup <msg>` | Show an alert box |
 | `/open_website <url>` | Open a website |

